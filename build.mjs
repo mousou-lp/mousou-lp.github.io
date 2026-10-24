@@ -213,23 +213,28 @@ async function fetchSeeds() {
     console.warn("GITHUB_TOKEN がないので、種なしで書き出します");
     return [];
   }
-  const query = `query {
-    repository(owner: "${ORG}", name: "${ORG}.github.io") {
-      discussionCategory(slug: "ideas") {
-        discussions(first: 100, orderBy: { field: CREATED_AT, direction: DESC }) {
-          nodes { title url body createdAt author { login } comments { totalCount } reactions(content: THUMBS_UP) { totalCount } }
-        }
-      }
-    }
-  }`;
-  const res = await fetch("https://api.github.com/graphql", {
-    method: "POST",
-    headers: { Authorization: `Bearer ${process.env.GITHUB_TOKEN}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ query }),
-  });
-  const json = await res.json();
-  if (!res.ok || json.errors) throw new Error(`種を取れませんでした: ${JSON.stringify(json.errors ?? res.status)}`);
-  const nodes = json.data.repository.discussionCategory?.discussions.nodes ?? [];
+  const gql = async (query, variables = {}) => {
+    const res = await fetch("https://api.github.com/graphql", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${process.env.GITHUB_TOKEN}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ query, variables }),
+    });
+    const json = await res.json();
+    if (!res.ok || json.errors) throw new Error(`種を取れませんでした: ${JSON.stringify(json.errors ?? res.status)}`);
+    return json.data.repository;
+  };
+  const repo = `repository(owner: "${ORG}", name: "${ORG}.github.io")`;
+  // 分類の中からは直接読めないので、Ideas の id を先に取る
+  const category = (await gql(`query { ${repo} { discussionCategory(slug: "ideas") { id } } }`)).discussionCategory;
+  if (!category) return [];
+  const nodes = (
+    await gql(
+      `query($c: ID!) { ${repo} { discussions(first: 100, categoryId: $c, orderBy: { field: CREATED_AT, direction: DESC }) {
+        nodes { title url body createdAt author { login } comments { totalCount } reactions(content: THUMBS_UP) { totalCount } }
+      } } }`,
+      { c: category.id },
+    )
+  ).discussions.nodes;
   return nodes
     .map((d) => {
       const form = parseForm(d.body ?? "");
