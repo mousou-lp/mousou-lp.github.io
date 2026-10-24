@@ -102,8 +102,9 @@ a:focus-visible {
   font-size: var(--text-lg);
   line-height: 1.8;
   font-weight: 700;
-  text-wrap: pretty;
-  word-break: auto-phrase;
+  /* 文節の切れ目（wbr）でだけ折る */
+  word-break: keep-all;
+  overflow-wrap: anywhere;
 }
 
 .site-lead {
