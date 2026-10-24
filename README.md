@@ -1,15 +1,16 @@
 # 妄想LP ポータル
 
-実在しないサービスのLPを集めた一覧のページです。LPそのものはここに置かず、1つのLPにつき1つのリポジトリを作り、ここには一覧にのせる情報だけを書きます。
+実在しないサービスのLPを集めた一覧のページです。https://mousou-lp.github.io に出ています。
+
+遊び場なので、だれが何を直してもかまいません。mainに直接入れても、プルリクエストを出してもいいです。mainに入ると、数分で自動で公開されます。
+
+LPそのものはここに置かず、1つのLPにつき1つのリポジトリを作ります。ここには一覧にのせる情報だけを書きます。
 
 ## LPを足す
 
-1. [lp-template](https://github.com/mousou-lp/lp-template)の「Use this template」から、`mousou-lp`の中に自分のLPのリポジトリを作る（名前は`<サービス名>-lp`）
-2. LPを作って、Netlifyなどで公開する
-3. このリポジトリにブランチを切り、次の2つを足してプルリクエストを出す
-   - `lps.json`に1件
-   - `public/thumbs/<slug>.webp`にサムネイル（横960px、縦600px、16:10）
-4. チェックが通り、だれか1人がよしとしたらマージする。マージすると一覧に出る
+1. [lp-template](https://github.com/mousou-lp/lp-template)の「Use this template」から、`mousou-lp`の中に自分のLPのリポジトリを作る（名前は`<サービス名>-lp`、公開にする）
+2. LPを作ってmainに入れる。`https://mousou-lp.github.io/リポジトリ名/`に自動で出る
+3. このリポジトリの`lps.json`に1件足し、`public/thumbs/<slug>.webp`にサムネイル（横960px、縦600px、16:10）を置く
 
 `lps.json`の1件はこう書きます。
 
@@ -19,7 +20,7 @@
   "title": "ETERNAL PET",
   "summary": "60字までの、どんなサービスかの説明。",
   "author": "GitHubのユーザー名",
-  "url": "https://公開したURL/",
+  "url": "https://mousou-lp.github.io/eternal-pet-lp/",
   "thumbnail": "thumbs/eternal-pet.webp",
   "date": "2026-10-24"
 }
@@ -28,14 +29,15 @@
 ## 手元で見る
 
 ```bash
-node build.mjs && npx serve dist
+node build.mjs && python3 -m http.server 5180 -d dist
 ```
 
-`node build.mjs --check`で`lps.json`の書き方だけを確かめられます。同じチェックがプルリクエストでも動きます。
+`node build.mjs --check`で`lps.json`の書き方だけを確かめられます。同じチェックがmainに入るときとプルリクエストでも動き、通らないと公開されません。
 
 ## 決まり
 
-- 架空のサービスなので、どのLPも検索エンジンに載せない（`noindex`）
+- 架空のサービスなので、検索エンジンに載せない。`public/robots.txt`が、各LPもふくめてまとめて止めている
 - 実在する会社や人の名前、ロゴを使わない
 - 本物の申し込みや支払いを受け付けない。フォームは送っても何も起きないようにする
+- お金のかかるサービスは使わない。GitHubの無料の範囲で作る
 - 見た目の決まりは[DESIGN.md](DESIGN.md)
