@@ -4,10 +4,21 @@ on:
   pull_request:
   push:
     branches: [main]
+  # LPのリクエスト（Issue）が増えたり閉じたりしたら、一覧を作り直す
+  issues:
+    types: [opened, edited, closed, reopened, deleted, labeled, unlabeled]
+  workflow_dispatch:
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
 
 jobs:
   lps:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: read
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -15,14 +26,16 @@ jobs:
           node-version: 22
       - run: node build.mjs --check
       - run: node build.mjs
-      - if: github.event_name == 'push'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+      - if: github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v3
         with:
           path: dist
 
-  # main に入ったら https://mousou-lp.github.io に出す
+  # main に入ったときと、リクエストが変わったときに https://mousou-lp.github.io に出す
   deploy:
-    if: github.event_name == 'push'
+    if: github.event_name != 'pull_request'
     needs: lps
     runs-on: ubuntu-latest
     permissions:

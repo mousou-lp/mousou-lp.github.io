@@ -169,6 +169,105 @@ a:focus-visible {
 }
 
 .empty {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+.section {
+  margin-top: var(--space-16);
+}
+
+.section-title {
+  margin: 0 0 var(--space-4);
+  font-size: var(--text-lg);
+  line-height: 1.4;
+  font-weight: 700;
+}
+
+.section-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4) var(--space-8);
+  margin-bottom: var(--space-6);
+}
+
+.section-head .section-title {
+  margin-bottom: 0;
+}
+
+.section-lead {
+  margin: var(--space-1) 0 0;
+  max-width: 36em;
+  color: var(--color-text-muted);
+  text-wrap: pretty;
+  word-break: auto-phrase;
+}
+
+/* 黒いボタンは1画面に1つ（リクエストを書く） */
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius);
+  background: var(--color-text);
+  color: var(--color-bg);
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.button:hover {
+  opacity: 0.85;
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.button__icon {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.requests {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--color-border);
+}
+
+.request {
+  padding-block: var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.request__name {
+  margin: 0;
+  font-size: var(--text-md);
+  line-height: 1.5;
+  font-weight: 700;
+}
+
+.request__idea {
+  margin: 0;
+  line-break: strict;
+  text-wrap: pretty;
+  word-break: auto-phrase;
+}
+
+.request__who {
+  margin: var(--space-1) 0 0;
+  font-size: var(--text-sm);
   color: var(--color-text-muted);
 }
 
