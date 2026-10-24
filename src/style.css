@@ -137,6 +137,9 @@ a:focus-visible {
 }
 
 .site-count {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--space-4);
   margin: var(--space-2) 0 0;
   font-size: var(--text-sm);
   color: var(--color-text-muted);
@@ -205,37 +208,10 @@ a:focus-visible {
   color: var(--color-text-muted);
 }
 
-.section {
-  margin-top: var(--space-16);
-}
 
-.section-title {
-  margin: 0 0 var(--space-4);
-  font-size: var(--text-lg);
-  line-height: 1.4;
-  font-weight: 700;
-}
 
-.section-head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: var(--space-4) var(--space-8);
-  margin-bottom: var(--space-6);
-}
 
-.section-head .section-title {
-  margin-bottom: 0;
-}
 
-.section-lead {
-  margin: var(--space-1) 0 0;
-  max-width: 36em;
-  color: var(--color-text-muted);
-  text-wrap: pretty;
-  word-break: auto-phrase;
-}
 
 /* 黒いボタンは1画面に1つ（リクエストを書く） */
 .button {
@@ -271,37 +247,10 @@ a:focus-visible {
   stroke-linejoin: round;
 }
 
-.requests {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  border-top: 1px solid var(--color-border);
-}
 
-.request {
-  padding-block: var(--space-4);
-  border-bottom: 1px solid var(--color-border);
-}
 
-.request__name {
-  margin: 0;
-  font-size: var(--text-md);
-  line-height: 1.5;
-  font-weight: 700;
-}
 
-.request__idea {
-  margin: 0;
-  line-break: strict;
-  text-wrap: pretty;
-  word-break: auto-phrase;
-}
 
-.request__who {
-  margin: var(--space-1) 0 0;
-  font-size: var(--text-sm);
-  color: var(--color-text-muted);
-}
 
 .site-footer {
   margin-top: var(--space-16);
@@ -313,4 +262,125 @@ a:focus-visible {
 .site-footer .container {
   display: flex;
   gap: var(--space-6);
+}
+
+.request-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4) var(--space-8);
+  padding: var(--space-4) var(--space-6);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+}
+
+.request-bar__text {
+  flex: 1 1 24em;
+  margin: 0;
+  font-size: var(--text-sm);
+  line-break: strict;
+}
+
+/* 時代の見出しへ飛ぶ。横に流れる一覧 */
+.era-nav {
+  display: flex;
+  gap: var(--space-2);
+  margin-top: var(--space-8);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.era-nav a {
+  flex: none;
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  font-size: var(--text-sm);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.era-nav a:hover {
+  border-color: var(--color-text);
+}
+
+.timeline {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.era {
+  position: relative;
+  margin-top: var(--space-12);
+  scroll-margin-top: var(--space-4);
+}
+
+.era__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-1) var(--space-4);
+  margin-bottom: var(--space-6);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--color-text);
+}
+
+.era__title {
+  margin: 0;
+  font-size: var(--text-xl);
+  line-height: 1.2;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.era__note {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+/* まだLPのないリクエスト。サムネイルの代わりに点線の箱 */
+.card__soon {
+  display: grid;
+  place-content: center;
+  gap: var(--space-1);
+  aspect-ratio: 16 / 10;
+  border: 1px dashed var(--color-text-muted);
+  border-radius: var(--radius);
+  text-align: center;
+}
+
+.card__soon-label {
+  font-size: var(--text-lg);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.card__soon-note {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.card__link:hover .card__soon {
+  border-style: solid;
+  border-color: var(--color-text);
+}
+
+.votes {
+  color: var(--color-text);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.card__by {
+  margin: var(--space-1) 0 0;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.site-count span {
+  white-space: nowrap;
 }

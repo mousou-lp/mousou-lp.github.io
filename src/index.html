@@ -19,30 +19,20 @@
       <div class="container">
         <h1 class="site-title">妄想LP</h1>
         <p class="site-motto">未来の技術と<wbr />自分の偏愛から、<wbr />架空のサービスを<wbr />妄想する。<br />その未来を<wbr />考えることで、<wbr />いまの自分の<wbr />生き方に<wbr />干渉して、<wbr />ポジティブな<wbr />変化を起こす。</p>
-        <p class="site-lead">ここに並ぶのは、そうして妄想したサービスのLPです。どれも架空のもので、申し込みはできません。</p>
-        <p class="site-count">のせているLP：<!-- COUNT -->件</p>
+        <p class="site-lead">ここに並ぶのは、そうして妄想したサービスです。いつごろの未来のサービスかで、年表のように並べています。Coming soonのものは、まだLPがなく、作る人を待っているリクエストです。どれも架空のもので、申し込みはできません。</p>
+        <p class="site-count"><span>のせているLP：<!-- COUNT -->件</span><span>作る人を待っているリクエスト：<!-- SOON -->件</span></p>
       </div>
     </header>
 
     <main class="container">
-      <section aria-labelledby="lps-title">
-        <h2 class="section-title" id="lps-title">LP</h2>
-        <!-- LPS -->
-      </section>
-
-      <section class="section" aria-labelledby="requests-title">
-        <div class="section-head">
-          <div>
-            <h2 class="section-title" id="requests-title">作る人を待っているリクエスト</h2>
-            <p class="section-lead">こんなサービスのLPを見てみたい、を書いておく場所です。作れそうなものがあったら、だれが作ってもかまいません。</p>
-          </div>
-          <a class="button" href="https://github.com/<!-- ORG -->/mousou-lp.github.io/issues/new?template=lp-request.yml">
-            リクエストを書く
-            <svg class="button__icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7h10v10" /><path d="M7 17 17 7" /></svg>
-          </a>
-        </div>
-        <!-- REQUESTS -->
-      </section>
+      <div class="request-bar">
+        <p class="request-bar__text">LPはまだないけれど、こんなサービスを見てみたい、というときはリクエストに書きます。面白そうなリクエストには、GitHubで親指のマークを押すと1票になります。票は1時間ごとに数え直します。</p>
+        <a class="button" href="https://github.com/<!-- ORG -->/mousou-lp.github.io/issues/new?template=lp-request.yml">
+          リクエストを書く
+          <svg class="button__icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7h10v10" /><path d="M7 17 17 7" /></svg>
+        </a>
+      </div>
+      <!-- TIMELINE -->
     </main>
 
     <footer class="site-footer">

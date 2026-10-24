@@ -7,6 +7,9 @@ on:
   # LPのリクエスト（Issue）が増えたり閉じたりしたら、一覧を作り直す
   issues:
     types: [opened, edited, closed, reopened, deleted, labeled, unlabeled]
+  # 面白そうの票（Issueへの反応）では動かないので、1時間ごとに数え直す
+  schedule:
+    - cron: "17 * * * *"
   workflow_dispatch:
 
 concurrency:

@@ -11,6 +11,22 @@ body:
       placeholder: 例：飼っている猫の気持ちを、毎朝1行の天気予報にして届けるサービス
     validations:
       required: true
+  - type: dropdown
+    id: era
+    attributes:
+      label: いつごろの未来のサービスか
+      description: ポータルの年表で、この時代のところに並びます
+      options:
+        - 2030年代
+        - 2040年代
+        - 2050年代
+        - 2070年ごろ
+        - 2100年ごろ
+        - 2200年ごろ
+        - もっと先
+        - わからない
+    validations:
+      required: true
   - type: input
     id: who
     attributes:
@@ -24,4 +40,6 @@ body:
   - type: markdown
     attributes:
       value: |
+        面白そうと思った人は、このIssueのいちばん上の書きこみに、親指のマークで反応してください。ポータルに「面白そう」の数として出ます。
+
         作りはじめる人は、このIssueに一言書いてください。LPができたら、ポータルの`lps.json`に足して、このIssueを閉じます。閉じると、ポータルのリクエストの一覧から消えます。
