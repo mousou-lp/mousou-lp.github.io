@@ -122,6 +122,137 @@ await cp("src/style.css", "dist/style.css");
 await writeFile("dist/index.html", html);
 console.log(`dist/index.html: ${lps.length} 件の LP と ${requests.length} 件のリクエストを書き出しました`);
 
+// アイデアの種は、Discussions の Ideas に書かれたもの。ポータルのトップには出さず、/seeds/ にだけ並べる
+const seeds = await fetchSeeds();
+await mkdir("dist/seeds", { recursive: true });
+await writeFile("dist/seeds/index.html", seedsPage(seeds));
+console.log(`dist/seeds/index.html: ${seeds.length} 件の種を書き出しました`);
+
+function seedsPage(seeds) {
+  const newSeed = `https://github.com/${ORG}/${ORG}.github.io/discussions/new?category=ideas`;
+  const items = seeds
+    .map((s) => {
+      const promoted = requests.find((r) => r.body.includes(s.url));
+      const promote = `https://github.com/${ORG}/${ORG}.github.io/issues/new?${new URLSearchParams({
+        template: "lp-request.yml",
+        title: `LPのリクエスト: ${s.title}`,
+        idea: s.idea,
+        era: s.era,
+        more: `アイデアの種から。${s.url}`,
+      })}`;
+      return `
+          <li class="seed">
+            <h2 class="seed__title"><a href="${esc(s.url)}">${esc(s.title)}</a></h2>
+            ${s.idea !== s.title ? `<p class="seed__idea">${esc(s.idea)}</p>` : ""}
+            ${s.from ? `<p class="seed__from">${esc(s.from)}</p>` : ""}
+            <p class="card__meta">
+              <span class="seed__counts"><span class="votes">面白そう：${s.votes}票</span><span>重ねた考え：${s.comments}件</span><span>${esc(s.era)}</span></span>
+              <span>まいた人：<a href="https://github.com/${esc(s.author)}">@${esc(s.author)}</a></span>
+            </p>
+            <p class="seed__actions">
+              <a href="${esc(s.url)}">考えを重ねる</a>
+              ${promoted ? `<a href="${esc(promoted.url)}">LPの候補になりました</a>` : `<a href="${esc(promote)}">LPの候補にする</a>`}
+            </p>
+          </li>`;
+    })
+    .join("");
+  const list = seeds.length
+    ? `<ol class="seeds" role="list">${items}
+        </ol>`
+    : `<p class="empty">まだ種がありません。ひとことの妄想から、まいてみてください。</p>`;
+  return `<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>アイデアの種 | 妄想LP</title>
+    <meta name="description" content="まだLPにするほどではない妄想を置いて、みんなで考えを重ねる場所です。" />
+    <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../style.css" />
+  </head>
+  <body>
+    <nav class="site-nav container" aria-label="妄想LP">
+      <a href="../">妄想LP</a>
+      <a href="../mirai/">未来のこと</a>
+      <a href="../tane/">妄想のタネ</a>
+      <a href="./" aria-current="page">アイデアの種</a>
+    </nav>
+    <main class="container">
+      <header class="site-header">
+        <h1 class="site-title">アイデアの種</h1>
+        <p class="site-lead">まだLPにするほどではない妄想を、そのまま置いておく場所です。ここに置いた種は、ポータルのトップには出ません。ほかの人が考えを重ねて、面白くなったものをLPの候補に上げます。</p>
+      </header>
+      <ol class="ladder" role="list">
+        <li><span class="ladder__num" aria-hidden="true">1</span><span><strong>種をまく</strong>ひとことの妄想でかまいません</span></li>
+        <li><span class="ladder__num" aria-hidden="true">2</span><span><strong>考えを重ねる</strong>返信で、ふくらませたり、ひねったりします。面白そうなら親指のマークを押します</span></li>
+        <li><span class="ladder__num" aria-hidden="true">3</span><span><strong>LPの候補にする</strong>だれが上げてもかまいません。ポータルの年表に、Coming soonとして並びます</span></li>
+      </ol>
+      <p class="request-bar__actions">
+        <a class="button" href="${newSeed}">種をまく<svg class="button__icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7h10v10" /><path d="M7 17 17 7" /></svg></a>
+      </p>
+      <section class="seeds-section" aria-label="まかれた種">
+        ${list}
+      </section>
+    </main>
+    <footer class="site-footer">
+      <div class="container">
+        <a href="https://github.com/${ORG}/${ORG}.github.io/discussions/categories/ideas">GitHubで種を見る</a>
+        <a href="../">妄想LPのポータル</a>
+      </div>
+    </footer>
+  </body>
+</html>
+`;
+}
+
+async function fetchSeeds() {
+  // Discussions は GraphQL でしか読めず、読むにはトークンが要る。公開のときは Actions のトークンを使う
+  if (!process.env.GITHUB_TOKEN) {
+    if (process.env.CI) throw new Error("GITHUB_TOKEN がありません");
+    console.warn("GITHUB_TOKEN がないので、種なしで書き出します");
+    return [];
+  }
+  const query = `query {
+    repository(owner: "${ORG}", name: "${ORG}.github.io") {
+      discussionCategory(slug: "ideas") {
+        discussions(first: 100, orderBy: { field: CREATED_AT, direction: DESC }) {
+          nodes { title url body createdAt author { login } comments { totalCount } reactions(content: THUMBS_UP) { totalCount } }
+        }
+      }
+    }
+  }`;
+  const res = await fetch("https://api.github.com/graphql", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${process.env.GITHUB_TOKEN}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ query }),
+  });
+  const json = await res.json();
+  if (!res.ok || json.errors) throw new Error(`種を取れませんでした: ${JSON.stringify(json.errors ?? res.status)}`);
+  const nodes = json.data.repository.discussionCategory?.discussions.nodes ?? [];
+  return nodes
+    .map((d) => {
+      const form = parseForm(d.body ?? "");
+      // 名前を書いていない種は、説明をそのまま見出しにする
+      const named = d.title.replace(/^アイデアの種[:：]\s*/, "").trim();
+      const title = named || clip(form["どんな妄想か"] ?? "", 80);
+      const from = [form["どんな未来から考えたか"], form["どんな偏愛から考えたか"]].filter(Boolean).join(" × ");
+      return {
+        title: named ? clip(named, 40) : title,
+        idea: named ? clip(form["どんな妄想か"] || named, 160) : title,
+        era: ERAS.some((e) => e.name === form["いつごろの未来か"]) ? form["いつごろの未来か"] : "わからない",
+        from,
+        votes: d.reactions.totalCount,
+        comments: d.comments.totalCount,
+        author: d.author?.login ?? "ghost",
+        url: d.url,
+        createdAt: d.createdAt,
+      };
+    })
+    .filter((s) => s.title)
+    .sort((a, b) => b.votes + b.comments - (a.votes + a.comments) || b.createdAt.localeCompare(a.createdAt));
+}
+
 async function fetchRequests() {
   const url = `https://api.github.com/repos/${ORG}/${ORG}.github.io/issues?labels=lp-request&state=open&per_page=100`;
   const headers = { Accept: "application/vnd.github+json" };
@@ -152,6 +283,8 @@ async function fetchRequests() {
         votes: i.reactions?.["+1"] ?? 0,
         author: i.user.login,
         url: i.html_url,
+        // アイデアの種から上がったものかを見分けるのに使う
+        body: i.body ?? "",
       };
     })
     .filter((r) => r.idea);

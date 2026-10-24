@@ -1,0 +1,39 @@
+title: "アイデアの種: "
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        まだ形になっていない妄想を、そのまま置いておく場所です。ほかの人が返信で考えを重ねて、面白くなったらLPの候補に上げます。
+        面白そうと思ったら、この書きこみに親指のマークで反応してください。
+  - type: textarea
+    id: idea
+    attributes:
+      label: どんな妄想か
+      description: ひとことでもかまいません
+      placeholder: 例：銭湯の残り湯で、となりの店がパスタをゆでる町
+    validations:
+      required: true
+  - type: dropdown
+    id: era
+    attributes:
+      label: いつごろの未来か
+      options:
+        - 2030年代
+        - 2040年代
+        - 2050年代
+        - 2070年ごろ
+        - 2100年ごろ
+        - 2200年ごろ
+        - もっと先
+        - わからない
+  - type: input
+    id: future
+    attributes:
+      label: どんな未来から考えたか
+      placeholder: 例：水を、何度でも使えるようになる
+  - type: input
+    id: love
+    attributes:
+      label: どんな偏愛から考えたか
+      placeholder: 例：近所の銭湯
