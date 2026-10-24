@@ -22,11 +22,18 @@ body:
         - 2030年代
         - 2040年代
         - 2050年代
+        - 2060年代
         - 2070年ごろ
         - 2100年ごろ
         - 2200年ごろ
         - もっと先
         - わからない
+  - type: input
+    id: world
+    attributes:
+      label: どの未来の世界から考えたか
+      description: 未来の世界のページから来たときは、そのページのURLが入ります
+      placeholder: 例：https://mousou-lp.github.io/mirai/worlds/2150-ageless/
   - type: input
     id: future
     attributes:

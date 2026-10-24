@@ -9,6 +9,7 @@ const ERAS = [
   { name: "2030年代", note: "あと10年ほど" },
   { name: "2040年代", note: "あと20年ほど" },
   { name: "2050年代", note: "あと30年ほど" },
+  { name: "2060年代", note: "あと40年ほど" },
   { name: "2070年ごろ", note: "いまの子どもが大人になるころ" },
   { name: "2100年ごろ", note: "いまの子どもの子どもの時代" },
   { name: "2200年ごろ", note: "200年ほど先" },
@@ -124,42 +125,64 @@ console.log(`dist/index.html: ${lps.length} 件の LP と ${requests.length} 件
 
 // アイデアの種は、Discussions の Ideas に書かれたもの。ポータルのトップには出さず、/seeds/ にだけ並べる
 const seeds = await fetchSeeds();
+// 未来の世界の名前は、mirai が出している worlds.json から引く。取れなければURLの末尾で出す
+const worlds = await fetch("https://mousou-lp.github.io/mirai/worlds.json")
+  .then((r) => (r.ok ? r.json() : []))
+  .catch(() => []);
 await mkdir("dist/seeds", { recursive: true });
 await writeFile("dist/seeds/index.html", seedsPage(seeds));
 console.log(`dist/seeds/index.html: ${seeds.length} 件の種を書き出しました`);
 
 function seedsPage(seeds) {
   const newSeed = `https://github.com/${ORG}/${ORG}.github.io/discussions/new?category=ideas`;
-  const items = seeds
-    .map((s) => {
-      const promoted = requests.find((r) => r.body.includes(s.url));
-      const promote = `https://github.com/${ORG}/${ORG}.github.io/issues/new?${new URLSearchParams({
-        template: "lp-request.yml",
-        title: `LPのリクエスト: ${s.title}`,
-        idea: s.idea,
-        era: s.era,
-        more: `アイデアの種から。${s.url}`,
-      })}`;
-      return `
-          <li class="seed">
-            <h2 class="seed__title"><a href="${esc(s.url)}">${esc(s.title)}</a></h2>
-            ${s.idea !== s.title ? `<p class="seed__idea">${esc(s.idea)}</p>` : ""}
-            ${s.from ? `<p class="seed__from">${esc(s.from)}</p>` : ""}
-            <p class="card__meta">
-              <span class="seed__counts"><span class="votes">面白そう：${s.votes}票</span><span>重ねた考え：${s.comments}件</span><span>${esc(s.era)}</span>${s.rank ? `<span>事業の優先度：${s.rank}位</span>` : ""}</span>
-              <span>まいた人：<a href="https://github.com/${esc(s.author)}">@${esc(s.author)}</a></span>
-            </p>
-            <p class="seed__actions">
-              <a href="${esc(s.url)}">考えを重ねる</a>
-              ${promoted ? `<a href="${esc(promoted.url)}">LPの候補になりました</a>` : `<a href="${esc(promote)}">LPの候補にする</a>`}
-            </p>
-          </li>`;
-    })
-    .join("");
+  const seedItem = (s) => {
+    const promoted = requests.find((r) => r.body.includes(s.url));
+    const promote = `https://github.com/${ORG}/${ORG}.github.io/issues/new?${new URLSearchParams({
+      template: "lp-request.yml",
+      title: `LPのリクエスト: ${s.title}`,
+      idea: s.idea,
+      era: s.era,
+      more: `アイデアの種から。${s.url}`,
+    })}`;
+    const world = s.world && (worlds.find((w) => w.slug === s.world) ?? { slug: s.world, title: s.world });
+    return `
+            <li class="seed"${world ? ` data-world="${esc(world.slug)}"` : ""}>
+              <h3 class="seed__title"><a href="${esc(s.url)}">${esc(s.title)}</a></h3>
+              ${s.idea !== s.title ? `<p class="seed__idea">${esc(s.idea)}</p>` : ""}
+              ${world ? `<p class="seed__from">未来の世界：<a href="../mirai/worlds/${esc(world.slug)}/">${esc(world.title)}</a></p>` : ""}
+              ${s.from ? `<p class="seed__from">${esc(s.from)}</p>` : ""}
+              <p class="card__meta">
+                <span class="seed__counts"><span class="votes">面白そう：${s.votes}票</span><span>重ねた考え：${s.comments}件</span>${s.rank ? `<span>事業の優先度：${s.rank}位</span>` : ""}</span>
+                <span>まいた人：<a href="https://github.com/${esc(s.author)}">@${esc(s.author)}</a></span>
+              </p>
+              <p class="seed__actions">
+                <a href="${esc(s.url)}">考えを重ねる</a>
+                ${promoted ? `<a href="${esc(promoted.url)}">LPの候補になりました</a>` : `<a href="${esc(promote)}">LPの候補にする</a>`}
+              </p>
+            </li>`;
+  };
+  // 年表と同じ時代ごとにまとめる
+  const groups = ERAS.map((e, i) => ({ ...e, id: `seeds-era-${i + 1}`, items: seeds.filter((s) => s.era === e.name) })).filter((g) => g.items.length);
   const list = seeds.length
-    ? `<ol class="seeds" role="list">${items}
-        </ol>`
+    ? `<nav class="era-nav" aria-label="時代">
+          ${groups.map((g) => `<a href="#${g.id}">${esc(g.name)}<span class="era-nav__count">${g.items.length}件</span></a>`).join("\n          ")}
+        </nav>
+        <p class="world-filter" data-world-filter hidden>未来の世界「<span data-world-name></span>」の種だけを出しています。<a href="./">すべての種を見る</a></p>
+        ${groups
+          .map(
+            (g) => `
+        <section class="era" id="${g.id}" aria-labelledby="${g.id}-title">
+          <div class="era__head">
+            <h2 class="era__title" id="${g.id}-title">${esc(g.name)}</h2>
+            <p class="era__note">${esc(g.note)}</p>
+          </div>
+          <ol class="seeds" role="list">${g.items.map(seedItem).join("")}
+          </ol>
+        </section>`,
+          )
+          .join("")}`
     : `<p class="empty">まだ種がありません。ひとことの妄想から、まいてみてください。</p>`;
+  const worldNames = Object.fromEntries(worlds.map((w) => [w.slug, w.title]));
   return `<!doctype html>
 <html lang="ja">
   <head>
@@ -201,6 +224,21 @@ function seedsPage(seeds) {
         <a href="../">妄想LPのポータル</a>
       </div>
     </footer>
+    <script>
+      // ?world=<世界のslug> で来たときは、その世界の種だけを出す
+      const world = new URLSearchParams(location.search).get("world");
+      if (world) {
+        const names = ${JSON.stringify(worldNames).replace(/</g, "\\u003c")};
+        document.querySelectorAll(".seed").forEach((li) => (li.hidden = li.dataset.world !== world));
+        document.querySelectorAll(".era").forEach((sec) => (sec.hidden = !sec.querySelector(".seed:not([hidden])")));
+        const note = document.querySelector("[data-world-filter]");
+        if (note) {
+          note.hidden = false;
+          note.querySelector("[data-world-name]").textContent = names[world] ?? world;
+        }
+        document.querySelector(".era-nav")?.setAttribute("hidden", "");
+      }
+    </script>
   </body>
 </html>
 `;
@@ -247,6 +285,7 @@ async function fetchSeeds() {
         idea: named ? clip(form["どんな妄想か"] || named, 160) : title,
         era: ERAS.some((e) => e.name === form["いつごろの未来か"]) ? form["いつごろの未来か"] : "わからない",
         from,
+        world: form["どの未来の世界から考えたか"]?.match(/\/worlds\/([a-z0-9-]+)/)?.[1] ?? "",
         // 新規事業として比べたときの順位。書いてある種だけ
         rank: Number(form["新規事業としての優先度"]?.match(/^(\d+)位/)?.[1]) || null,
         votes: d.reactions.totalCount,

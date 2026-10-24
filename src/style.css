@@ -489,3 +489,21 @@ a:focus-visible {
   font-size: var(--text-sm);
   font-weight: 700;
 }
+
+.era-nav__count {
+  margin-left: var(--space-1);
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.world-filter {
+  margin: var(--space-8) 0 0;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  font-size: var(--text-sm);
+}
+
+.era .seeds {
+  border-top: 0;
+}
