@@ -146,7 +146,7 @@ function seedsPage(seeds) {
             ${s.idea !== s.title ? `<p class="seed__idea">${esc(s.idea)}</p>` : ""}
             ${s.from ? `<p class="seed__from">${esc(s.from)}</p>` : ""}
             <p class="card__meta">
-              <span class="seed__counts"><span class="votes">面白そう：${s.votes}票</span><span>重ねた考え：${s.comments}件</span><span>${esc(s.era)}</span></span>
+              <span class="seed__counts"><span class="votes">面白そう：${s.votes}票</span><span>重ねた考え：${s.comments}件</span><span>${esc(s.era)}</span>${s.rank ? `<span>事業の優先度：${s.rank}位</span>` : ""}</span>
               <span>まいた人：<a href="https://github.com/${esc(s.author)}">@${esc(s.author)}</a></span>
             </p>
             <p class="seed__actions">
@@ -247,6 +247,8 @@ async function fetchSeeds() {
         idea: named ? clip(form["どんな妄想か"] || named, 160) : title,
         era: ERAS.some((e) => e.name === form["いつごろの未来か"]) ? form["いつごろの未来か"] : "わからない",
         from,
+        // 新規事業として比べたときの順位。書いてある種だけ
+        rank: Number(form["新規事業としての優先度"]?.match(/^(\d+)位/)?.[1]) || null,
         votes: d.reactions.totalCount,
         comments: d.comments.totalCount,
         author: d.author?.login ?? "ghost",
@@ -255,7 +257,12 @@ async function fetchSeeds() {
       };
     })
     .filter((s) => s.title)
-    .sort((a, b) => b.votes + b.comments - (a.votes + a.comments) || b.createdAt.localeCompare(a.createdAt));
+    .sort(
+      (a, b) =>
+        b.votes + b.comments - (a.votes + a.comments) ||
+        (a.rank ?? 99) - (b.rank ?? 99) ||
+        b.createdAt.localeCompare(a.createdAt),
+    );
 }
 
 async function fetchRequests() {
