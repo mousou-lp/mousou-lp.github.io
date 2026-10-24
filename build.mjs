@@ -265,14 +265,22 @@ async function fetchSeeds() {
   // 分類の中からは直接読めないので、Ideas の id を先に取る
   const category = (await gql(`query { ${repo} { discussionCategory(slug: "ideas") { id } } }`)).discussionCategory;
   if (!category) return [];
-  const nodes = (
-    await gql(
-      `query($c: ID!) { ${repo} { discussions(first: 100, categoryId: $c, orderBy: { field: CREATED_AT, direction: DESC }) {
-        nodes { title url body createdAt author { login } comments { totalCount } reactions(content: THUMBS_UP) { totalCount } }
-      } } }`,
-      { c: category.id },
-    )
-  ).discussions.nodes;
+  // 1回に100件までしか読めないので、続きがあるあいだ読み続ける
+  const nodes = [];
+  for (let after = null; ; ) {
+    const page = (
+      await gql(
+        `query($c: ID!, $after: String) { ${repo} { discussions(first: 100, after: $after, categoryId: $c, orderBy: { field: CREATED_AT, direction: DESC }) {
+          nodes { title url body createdAt author { login } comments { totalCount } reactions(content: THUMBS_UP) { totalCount } }
+          pageInfo { hasNextPage endCursor }
+        } } }`,
+        { c: category.id, after },
+      )
+    ).discussions;
+    nodes.push(...page.nodes);
+    if (!page.pageInfo.hasNextPage) break;
+    after = page.pageInfo.endCursor;
+  }
   return nodes
     .map((d) => {
       const form = parseForm(d.body ?? "");
