@@ -8,14 +8,14 @@ body:
     attributes:
       label: どんなサービスか
       description: ポータルの一覧にそのまま出ます。1〜2文で書いてください
-      placeholder: 例 飼っている猫の気持ちを、毎朝1行の天気予報にして届けるサービス
+      placeholder: 例：飼っている猫の気持ちを、毎朝1行の天気予報にして届けるサービス
     validations:
       required: true
   - type: input
     id: who
     attributes:
       label: だれのためのサービスか
-      placeholder: 例 ひとり暮らしで猫を飼っている人
+      placeholder: 例：ひとり暮らしで猫を飼っている人
   - type: textarea
     id: more
     attributes:

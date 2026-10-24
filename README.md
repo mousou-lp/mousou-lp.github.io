@@ -11,6 +11,7 @@ LPそのものはここに置かず、1つのLPにつき1つのリポジトリ�
 ## ほかのリポジトリ
 
 - [mirai](https://github.com/mousou-lp/mirai): 妄想のもとにする、未来の技術とくらしのまとめ。`https://mousou-lp.github.io/mirai/`に出る
+- [tane](https://github.com/mousou-lp/tane): 未来のことと自分の偏愛をかけあわせて、架空のサービスを考えるのを手伝うページ。`https://mousou-lp.github.io/tane/`に出る
 - [lp-template](https://github.com/mousou-lp/lp-template): LPを1つ作るためのひな形
 
 ## LPを足す
