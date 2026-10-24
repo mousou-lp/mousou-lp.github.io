@@ -8,6 +8,11 @@
 
 LPそのものはここに置かず、1つのLPにつき1つのリポジトリを作ります。ここには一覧にのせる情報だけを書きます。
 
+## ほかのリポジトリ
+
+- [mirai](https://github.com/mousou-lp/mirai): 妄想のもとにする、未来の技術とくらしのまとめ。`https://mousou-lp.github.io/mirai/`に出る
+- [lp-template](https://github.com/mousou-lp/lp-template): LPを1つ作るためのひな形
+
 ## LPを足す
 
 1. [lp-template](https://github.com/mousou-lp/lp-template)の「Use this template」から、`mousou-lp`の中に自分のLPのリポジトリを作る（名前は`<サービス名>-lp`、公開にする）
